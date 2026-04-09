@@ -13,9 +13,10 @@ function formatDate(date: Date | null | undefined): string | null {
 function formatProductionOrderDates(order: any) {
   return {
     ...order,
-    startDate: formatDate(order.startDate),
-    completionDate: formatDate(order.completionDate),
-    deliveryDate: formatDate(order.deliveryDate),
+    orderSignedDate: formatDate(order.orderSignedDate),
+    productionStartDate: formatDate(order.productionStartDate),
+    completedDate: formatDate(order.completedDate),
+    deadlineDate: formatDate(order.deadlineDate),
     createdAt: formatDate(order.createdAt),
   };
 }
@@ -34,9 +35,10 @@ function formatProductionLogDates(log: any) {
 export async function createProductionOrder(data: {
   orderCode: string;
   totalQuantity: number;
-  startDate?: Date;
-  completionDate?: Date;
-  deliveryDate: Date;
+  orderSignedDate?: Date;
+  productionStartDate?: Date;
+  completedDate?: Date;
+  deadlineDate: Date;
   deviceTypeId: number;
 }) {
   const result = await prisma.productionOrder.create({
@@ -88,9 +90,10 @@ export async function updateProductionOrder(
   data: {
     orderCode?: string;
     totalQuantity?: number;
-    startDate?: Date;
-    completionDate?: Date;
-    deliveryDate?: Date;
+    orderSignedDate?: Date;
+    productionStartDate?: Date;
+    completedDate?: Date;
+    deadlineDate?: Date;
     deviceTypeId?: number | null;
     status?: ProductionOrderStatus;
   }

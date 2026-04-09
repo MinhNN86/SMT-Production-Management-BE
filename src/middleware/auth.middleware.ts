@@ -7,6 +7,7 @@
  */
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import prisma from "../config/prisma.js";
 
 const jwtSecret = process.env["JWT_SECRET"];
 
@@ -15,7 +16,6 @@ if (!jwtSecret) {
 }
 const JWT_SECRET: string = jwtSecret;
 
-// Mở rộng Request type để chứa thông tin user
 export interface AuthRequest extends Request {
   user?: {
     id: string;
@@ -28,9 +28,9 @@ export interface AuthRequest extends Request {
 
 // ==========================================
 // MIDDLEWARE XÁC THỰC JWT
-// Kiểm tra token → gắn user info vào request
+// Kiểm tra token → trích id → fetch user từ DB → gắn vào request
 // ==========================================
-export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
+export async function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -41,8 +41,25 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
   const token = authHeader.split(" ")[1]!;
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthRequest["user"];
-    req.user = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        fullName: true,
+        workerCode: true,
+      },
+    });
+
+    if (!user) {
+      res.status(401).json({ error: "Người dùng không tồn tại." });
+      return;
+    }
+
+    req.user = user as AuthRequest["user"];
     next();
   } catch {
     res.status(401).json({ error: "Token không hợp lệ hoặc đã hết hạn." });
@@ -51,8 +68,9 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
 
 // ==========================================
 // MIDDLEWARE PHÂN QUYỀN THEO ROLE
+// SYSTEM_ADMIN: toàn quyền
+// ADMIN: toàn quyền (trừ quản lý user)
 // USER: chỉ được GET (xem dữ liệu)
-// ADMIN: được full quyền (GET, POST, PUT, DELETE)
 // ==========================================
 export function authorizeRole(req: AuthRequest, res: Response, next: NextFunction) {
   const user = req.user;
@@ -62,20 +80,67 @@ export function authorizeRole(req: AuthRequest, res: Response, next: NextFunctio
     return;
   }
 
-  // SYSTEM_ADMIN và ADMIN được phép tất cả
-  if (user.role === "SYSTEM_ADMIN" || user.role === "ADMIN") {
+  // SYSTEM_ADMIN được phép tất cả
+  if (user.role === "SYSTEM_ADMIN") {
+    next();
+    return;
+  }
+
+  // ADMIN được phép tất cả các API trừ user management
+  if (user.role === "ADMIN") {
     next();
     return;
   }
 
   // USER chỉ được phép GET (xem dữ liệu)
-  if (req.method === "GET") {
+  if (user.role === "USER" && req.method === "GET") {
     next();
     return;
   }
 
-  // USER không được POST, PUT, DELETE
   res.status(403).json({
-    error: "Bạn không có quyền thực hiện thao tác này. Chỉ ADMIN mới được thêm/sửa/xóa.",
+    error: "Bạn không có quyền thực hiện thao tác này. Chỉ SYSTEM_ADMIN và ADMIN được toàn quyền, USER chỉ được xem dữ liệu.",
+  });
+}
+
+// ==========================================
+// MIDDLEWARE PHÂN QUYỀN QUẢN LÝ USER
+// SYSTEM_ADMIN: toàn quyền (CRUD user khác)
+// ADMIN: GET tất cả users, PUT chỉ chính mình
+// USER: PUT chỉ chính mình
+// ==========================================
+export function authorizeUserManagement(req: AuthRequest, res: Response, next: NextFunction) {
+  const user = req.user;
+
+  if (!user) {
+    res.status(401).json({ error: "Chưa xác thực." });
+    return;
+  }
+
+  // SYSTEM_ADMIN được phép tất cả
+  if (user.role === "SYSTEM_ADMIN") {
+    next();
+    return;
+  }
+
+  // ADMIN được GET tất cả users
+  if (user.role === "ADMIN" && req.method === "GET") {
+    next();
+    return;
+  }
+
+  // ADMIN và USER chỉ được cập nhật chính mình (PUT /api/users/:id)
+  if ((user.role === "ADMIN" || user.role === "USER") && req.method === "PUT") {
+    const targetUserId = req.params["id"];
+    
+    // Kiểm tra có phải chính mình không
+    if (targetUserId === user.id) {
+      next();
+      return;
+    }
+  }
+
+  res.status(403).json({
+    error: "Bạn không có quyền thực hiện thao tác này. Chỉ SYSTEM_ADMIN được quản lý user, ADMIN được xem users và cập nhật chính mình, USER chỉ được cập nhật thông tin của chính mình.",
   });
 }

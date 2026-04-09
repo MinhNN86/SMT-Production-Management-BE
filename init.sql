@@ -46,9 +46,10 @@ CREATE TABLE production_orders (
   id SERIAL PRIMARY KEY,
   order_code VARCHAR(50) UNIQUE NOT NULL,
   total_quantity INT NOT NULL, -- Tổng số lượng thiết bị cần sản xuất
-  start_date DATE, -- Ngày bắt đầu sản xuất
-  completion_date DATE, -- Ngày hoàn thành
-  delivery_date DATE, -- Ngày cần bàn giao
+  order_signed_date DATE, -- Ngày ký lệnh: ngày nhận được lệnh xác nhận sản xuất
+  production_start_date DATE, -- Ngày bắt đầu: ngày bắt đầu nhận vật tư và bắt đầu sản xuất
+  completed_date DATE, -- Ngày hoàn thành: khi xong hết công đoạn và thành phẩm
+  deadline_date DATE, -- Ngày cần giao: deadline của lệnh sản xuất
   device_type_id INT,
   status production_orders_status_enum DEFAULT 'PENDING',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -104,6 +105,28 @@ CREATE TABLE stage_device_types (
 );
 
 CREATE INDEX idx_stage_device_types_device_type_id ON stage_device_types(device_type_id);
+
+-- Bảng khâu tạm thời (backup stage) cho lệnh sản xuất cụ thể
+CREATE TABLE backup_stages (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  order_id INT NOT NULL,
+  display_order INT NOT NULL DEFAULT 0,
+  description TEXT,
+  parent_stage_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT fk_backup_stages_order
+    FOREIGN KEY (order_id) REFERENCES production_orders(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_backup_stages_parent_stage
+    FOREIGN KEY (parent_stage_id) REFERENCES stages(id)
+    ON DELETE SET NULL
+);
+
+CREATE INDEX idx_backup_stages_order_id ON backup_stages(order_id);
+CREATE INDEX idx_backup_stages_parent_stage_id ON backup_stages(parent_stage_id);
 
 -- ==========================================
 -- BƯỚC 2: CA LÀM VIỆC
@@ -163,12 +186,17 @@ CREATE TABLE team_members (
 CREATE TABLE work_assignments (
   id SERIAL PRIMARY KEY,
   production_order_id INT NOT NULL,
-  stage_id INT NOT NULL,
+  stage_id INT,
+  backup_stage_id INT,
   shift_id INT NOT NULL,
   worker_id UUID NOT NULL,
   work_date DATE NOT NULL,
 
-  -- Đảm bảo 1 công nhân 1 ca chỉ làm 1 việc
+  CONSTRAINT chk_wa_exactly_one_stage CHECK (
+    (stage_id IS NOT NULL AND backup_stage_id IS NULL) OR
+    (stage_id IS NULL AND backup_stage_id IS NOT NULL)
+  ),
+
   CONSTRAINT unique_worker_shift UNIQUE (worker_id, work_date, shift_id),
 
   CONSTRAINT fk_wa_production_order
@@ -177,12 +205,18 @@ CREATE TABLE work_assignments (
   CONSTRAINT fk_wa_stage
     FOREIGN KEY (stage_id) REFERENCES stages(id),
 
+  CONSTRAINT fk_wa_backup_stage
+    FOREIGN KEY (backup_stage_id) REFERENCES backup_stages(id)
+    ON DELETE CASCADE,
+
   CONSTRAINT fk_wa_shift
     FOREIGN KEY (shift_id) REFERENCES shifts(id),
 
   CONSTRAINT fk_wa_worker
     FOREIGN KEY (worker_id) REFERENCES users(id)
 );
+
+CREATE INDEX idx_work_assignments_backup_stage_id ON work_assignments(backup_stage_id);
 
 -- ==========================================
 -- BƯỚC 4: NHẬT KÝ THỐNG KÊ SẢN XUẤT
@@ -191,18 +225,30 @@ CREATE TABLE work_assignments (
 CREATE TABLE production_logs (
   id SERIAL PRIMARY KEY,
   production_order_id INT NOT NULL,
-  stage_id INT NOT NULL,
+  stage_id INT,
+  backup_stage_id INT,
   shift_id INT NOT NULL,
   log_date DATE NOT NULL,
-  actual_quantity INT NOT NULL DEFAULT 0, -- Số lượng làm được thực tế trong ca
-  defective_quantity INT NOT NULL DEFAULT 0, -- Số lượng hàng lỗi
-  note TEXT, -- Ghi chú
+  actual_quantity INT NOT NULL DEFAULT 0,
+  defective_quantity INT NOT NULL DEFAULT 0,
+  note TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-  -- 1 ca của 1 ngày ở 1 khâu chỉ có 1 record tổng kết
-  CONSTRAINT unique_production_log UNIQUE (
+  CONSTRAINT chk_pl_exactly_one_stage CHECK (
+    (stage_id IS NOT NULL AND backup_stage_id IS NULL) OR
+    (stage_id IS NULL AND backup_stage_id IS NOT NULL)
+  ),
+
+  CONSTRAINT unique_production_log_stage UNIQUE (
     production_order_id,
     stage_id,
+    shift_id,
+    log_date
+  ),
+
+  CONSTRAINT unique_production_log_backup_stage UNIQUE (
+    production_order_id,
+    backup_stage_id,
     shift_id,
     log_date
   ),
@@ -212,6 +258,10 @@ CREATE TABLE production_logs (
 
   CONSTRAINT fk_pl_stage
     FOREIGN KEY (stage_id) REFERENCES stages(id),
+
+  CONSTRAINT fk_pl_backup_stage
+    FOREIGN KEY (backup_stage_id) REFERENCES backup_stages(id)
+    ON DELETE CASCADE,
 
   CONSTRAINT fk_pl_shift
     FOREIGN KEY (shift_id) REFERENCES shifts(id)

@@ -6,9 +6,12 @@
  */
 import { Router } from "express";
 import * as controller from "../controllers/statistics.controller.js";
+import { authenticate, authorizeRole } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", controller.getStatistics);
+router.use(authenticate);
+
+router.get("/", authorizeRole, controller.getStatistics);
 
 export default router;

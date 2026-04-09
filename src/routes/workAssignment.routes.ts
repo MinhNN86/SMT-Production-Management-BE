@@ -9,12 +9,15 @@
  */
 import { Router } from "express";
 import * as controller from "../controllers/workAssignment.controller.js";
+import { authenticate, authorizeRole } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.post("/", controller.create);
-router.put("/", controller.update);
-router.get("/", controller.getAll);
-router.delete("/", controller.remove);
+router.use(authenticate);
+
+router.post("/", authorizeRole, controller.create);
+router.put("/", authorizeRole, controller.update);
+router.get("/", authorizeRole, controller.getAll);
+router.delete("/", authorizeRole, controller.remove);
 
 export default router;

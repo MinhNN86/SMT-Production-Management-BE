@@ -12,24 +12,24 @@ import { transformEmbeddedShifts } from "../utils/transform.util.js";
 // ==========================================
 export async function create(req: Request, res: Response) {
   try {
-    const { orderCode, totalQuantity, startDate, completionDate, deliveryDate, deviceTypeId } = req.body as {
+    const { orderCode, totalQuantity, orderSignedDate, productionStartDate, completedDate, deadlineDate, deviceTypeId } = req.body as {
       orderCode?: string;
       totalQuantity?: number;
-      startDate?: string;
-      completionDate?: string;
-      deliveryDate?: string;
+      orderSignedDate?: string;
+      productionStartDate?: string;
+      completedDate?: string;
+      deadlineDate?: string;
       deviceTypeId?: number | null;
     };
 
-    // Kiểm tra dữ liệu đầu vào
-    if (!orderCode?.trim() || totalQuantity == null || !deliveryDate || deviceTypeId == null) {
-      sendError(res, 400, "Thiếu thông tin: orderCode, totalQuantity, deliveryDate, deviceTypeId là bắt buộc.");
+    if (!orderCode?.trim() || totalQuantity == null || !deadlineDate || deviceTypeId == null) {
+      sendError(res, 400, "Thiếu thông tin: orderCode, totalQuantity, deadlineDate, deviceTypeId là bắt buộc.");
       return;
     }
 
-    const parsedDeliveryDate = new Date(deliveryDate);
-    if (Number.isNaN(parsedDeliveryDate.getTime())) {
-      sendError(res, 400, "deliveryDate không hợp lệ.");
+    const parsedDeadlineDate = new Date(deadlineDate);
+    if (Number.isNaN(parsedDeadlineDate.getTime())) {
+      sendError(res, 400, "deadlineDate không hợp lệ.");
       return;
     }
 
@@ -46,15 +46,15 @@ export async function create(req: Request, res: Response) {
     const order = await productionOrderService.createProductionOrder({
       orderCode: orderCode.trim(),
       totalQuantity,
-      startDate: startDate ? new Date(startDate) : undefined,
-      completionDate: completionDate ? new Date(completionDate) : undefined,
-      deliveryDate: parsedDeliveryDate,
+      orderSignedDate: orderSignedDate ? new Date(orderSignedDate) : undefined,
+      productionStartDate: productionStartDate ? new Date(productionStartDate) : undefined,
+      completedDate: completedDate ? new Date(completedDate) : undefined,
+      deadlineDate: parsedDeadlineDate,
       deviceTypeId,
     });
 
     sendSuccess(res, 201, "Tạo lệnh sản xuất thành công.", order);
   } catch (error: any) {
-    // Xử lý lỗi trùng mã lệnh (unique constraint)
     if (error.code === "P2002") {
       sendError(res, 409, "Mã lệnh sản xuất đã tồn tại.");
       return;
@@ -104,21 +104,23 @@ export async function getById(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const id = parseInt(req.params["id"] as string, 10);
-    const { deliveryDate, startDate, completionDate, ...rest } = req.body as {
+    const { deadlineDate, orderSignedDate, productionStartDate, completedDate, ...rest } = req.body as {
       orderCode?: string;
       totalQuantity?: number;
-      startDate?: string;
-      completionDate?: string;
-      deliveryDate?: string;
+      orderSignedDate?: string;
+      productionStartDate?: string;
+      completedDate?: string;
+      deadlineDate?: string;
       deviceTypeId?: number | null;
       status?: "PENDING" | "IN_PROGRESS" | "COMPLETED";
     };
 
     const data = {
       ...rest,
-      startDate: startDate ? new Date(startDate) : undefined,
-      completionDate: completionDate ? new Date(completionDate) : undefined,
-      deliveryDate: deliveryDate ? new Date(deliveryDate) : undefined,
+      orderSignedDate: orderSignedDate ? new Date(orderSignedDate) : undefined,
+      productionStartDate: productionStartDate ? new Date(productionStartDate) : undefined,
+      completedDate: completedDate ? new Date(completedDate) : undefined,
+      deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
     };
 
     const order = await productionOrderService.updateProductionOrder(id, data);

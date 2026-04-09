@@ -3,21 +3,22 @@
  * Tầng Controller: Xử lý request/response cho nhân viên.
  * Bổ sung: Hỗ trợ các trường email, password, role.
  */
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import * as userService from "../services/user.service.js";
 import { sendError, sendSuccess } from "../utils/response.util.js";
+import type { AuthRequest } from "../middleware/auth.middleware.js";
 
 // ==========================================
-// TẠO NHÂN VIÊN MỚI (chỉ ADMIN)
+// TẠO NHÂN VIÊN MỚI (chỉ SYSTEM_ADMIN)
 // Có thể kèm email/password để worker có thể đăng nhập
 // ==========================================
-export async function create(req: Request, res: Response) {
+export async function create(req: AuthRequest, res: Response) {
   try {
     const { workerCode, fullName, type, email, password, role } = req.body as {
       workerCode: string;
       fullName: string;
       type?: "PARTTIME" | "FULLTIME";
-      email?: string;
+      email?: string; 
       password?: string;
       role?: "SYSTEM_ADMIN" | "ADMIN" | "USER";
     };
@@ -48,7 +49,7 @@ export async function create(req: Request, res: Response) {
 // ==========================================
 // LẤY DANH SÁCH NHÂN VIÊN
 // ==========================================
-export async function getAll(_req: Request, res: Response) {
+export async function getAll(_req: AuthRequest, res: Response) {
   try {
     const users = await userService.getAllUsers();
     sendSuccess(res, 200, "Lấy danh sách nhân viên thành công.", users);
@@ -60,7 +61,7 @@ export async function getAll(_req: Request, res: Response) {
 // ==========================================
 // LẤY CHI TIẾT 1 NHÂN VIÊN
 // ==========================================
-export async function getById(req: Request, res: Response) {
+export async function getById(req: AuthRequest, res: Response) {
   try {
     const id = req.params["id"] as string;
     const user = await userService.getUserById(id);
@@ -77,12 +78,14 @@ export async function getById(req: Request, res: Response) {
 }
 
 // ==========================================
-// CẬP NHẬT THÔNG TIN NHÂN VIÊN (chỉ ADMIN)
+// CẬP NHẬT THÔNG TIN NHÂN VIÊN
+// SYSTEM_ADMIN: cập nhật tất cả các trường
+// ADMIN/USER: chỉ được cập nhật fullName, email, password của chính mình
 // ==========================================
-export async function update(req: Request, res: Response) {
+export async function update(req: AuthRequest, res: Response) {
   try {
     const id = req.params["id"] as string;
-    const data = req.body as {
+    const body = req.body as {
       workerCode?: string;
       fullName?: string;
       type?: "PARTTIME" | "FULLTIME";
@@ -91,7 +94,19 @@ export async function update(req: Request, res: Response) {
       role?: "SYSTEM_ADMIN" | "ADMIN" | "USER";
     };
 
-    const user = await userService.updateUser(id, data);
+    if (req.user!.role !== "SYSTEM_ADMIN") {
+      const restrictedFields: string[] = [];
+      if ("workerCode" in body) restrictedFields.push("workerCode");
+      if ("type" in body) restrictedFields.push("type");
+      if ("role" in body) restrictedFields.push("role");
+
+      if (restrictedFields.length > 0) {
+        sendError(res, 400, `Bạn không có quyền thay đổi các trường: ${restrictedFields.join(", ")}. Chỉ có thể cập nhật fullName, email, password.`);
+        return;
+      }
+    }
+
+    const user = await userService.updateUser(id, body);
     sendSuccess(res, 200, "Cập nhật nhân viên thành công.", user);
   } catch (error: any) {
     if (error.code === "P2025") {
@@ -103,9 +118,9 @@ export async function update(req: Request, res: Response) {
 }
 
 // ==========================================
-// XÓA NHÂN VIÊN (chỉ ADMIN)
+// XÓA NHÂN VIÊN (chỉ SYSTEM_ADMIN)
 // ==========================================
-export async function remove(req: Request, res: Response) {
+export async function remove(req: AuthRequest, res: Response) {
   try {
     const id = req.params["id"] as string;
     await userService.deleteUser(id);

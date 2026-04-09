@@ -10,13 +10,16 @@
  */
 import { Router } from "express";
 import * as controller from "../controllers/productionLog.controller.js";
+import { authenticate, authorizeRole } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.post("/", controller.upsert);
-router.post("/bulk", controller.bulkUpsert);
-router.get("/", controller.getAll);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.use(authenticate);
+
+router.post("/", authorizeRole, controller.upsert);
+router.post("/bulk", authorizeRole, controller.bulkUpsert);
+router.get("/", authorizeRole, controller.getAll);
+router.put("/:id", authorizeRole, controller.update);
+router.delete("/:id", authorizeRole, controller.remove);
 
 export default router;

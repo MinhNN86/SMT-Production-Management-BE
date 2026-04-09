@@ -33,16 +33,7 @@ export async function login(email: string, password: string) {
     throw new Error("Email hoặc mật khẩu không đúng.");
   }
 
-  // Tạo JWT token chứa thông tin user
-  const payload = {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    fullName: user.fullName,
-    workerCode: user.workerCode,
-  };
-
-  const token = jwt.sign(payload, JWT_SECRET, {
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 

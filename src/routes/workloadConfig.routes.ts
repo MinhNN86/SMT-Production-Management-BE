@@ -10,13 +10,16 @@
  */
 import { Router } from "express";
 import * as controller from "../controllers/workloadConfig.controller.js";
+import { authenticate, authorizeRole } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.post("/", controller.create);
-router.get("/", controller.getAll);
-router.get("/:id", controller.getById);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.use(authenticate);
+
+router.post("/", authorizeRole, controller.create);
+router.get("/", authorizeRole, controller.getAll);
+router.get("/:id", authorizeRole, controller.getById);
+router.put("/:id", authorizeRole, controller.update);
+router.delete("/:id", authorizeRole, controller.remove);
 
 export default router;

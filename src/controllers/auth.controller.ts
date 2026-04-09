@@ -44,7 +44,8 @@ export async function login(req: Request, res: Response) {
 // ĐỔI MẬT KHẨU
 // PUT /api/auth/change-password
 // Body: { userId?, oldPassword?, newPassword }
-// - Admin có thể đổi mật khẩu của bất kỳ user nào (cung cấp userId, không cần oldPassword)
+// - SYSTEM_ADMIN có thể đổi mật khẩu của bất kỳ user nào (cung cấp userId, không cần oldPassword)
+// - ADMIN chỉ có thể đổi mật khẩu của chính mình (không cần cung cấp userId, cần oldPassword)
 // - User chỉ có thể đổi mật khẩu của chính mình (không cần cung cấp userId, cần oldPassword)
 // ==========================================
 export async function changePassword(req: AuthRequest, res: Response) {
@@ -72,9 +73,9 @@ export async function changePassword(req: AuthRequest, res: Response) {
     let isAdminChangingOtherUser = false;
 
     if (userId !== undefined) {
-      // Admin muốn đổi mật khẩu của user khác
-      if (req.user?.role !== "ADMIN") {
-        sendError(res, 403, "Bạn không có quyền đổi mật khẩu của người khác. Chỉ ADMIN mới được phép.");
+      // SYSTEM_ADMIN muốn đổi mật khẩu của user khác
+      if (req.user?.role !== "SYSTEM_ADMIN") {
+        sendError(res, 403, "Bạn không có quyền đổi mật khẩu của người khác. Chỉ SYSTEM_ADMIN mới được phép.");
         return;
       }
       targetUserId = userId;
