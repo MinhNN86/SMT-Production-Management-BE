@@ -1,7 +1,7 @@
 /**
  * Stage Service
  * Tầng Business Logic: Xử lý CRUD cho khâu sản xuất với
- * quan hệ cha-con qua bảng stage_hierarchy và loại thiết bị qua stage_device_types.
+ * quan hệ cha-con qua bảng stage_hierarchy.
  */
 import prisma from "../config/prisma.js";
 import type { Prisma } from "../../generated/prisma/client.js";
@@ -16,13 +16,13 @@ type StageWithConfigs = {
   name: string;
   displayOrder: number;
   description: string | null;
+  deviceTypeId: number | null;
+  deviceType: StageDeviceTypeSummary | null;
   parentStageId: number | null;
   parent: {
     id: number;
     name: string;
   } | null;
-  deviceTypeIds: number[];
-  deviceTypes: StageDeviceTypeSummary[];
   workloadConfigs: Array<{
     id: number;
     stageId: number;
@@ -46,15 +46,8 @@ async function getStageRecords() {
           },
         },
       },
-      stageDeviceTypes: {
-        include: {
-          deviceType: {
-            select: { id: true, name: true },
-          },
-        },
-        orderBy: {
-          deviceTypeId: "asc",
-        },
+      deviceType: {
+        select: { id: true, name: true },
       },
       workloadConfigs: {
         orderBy: [{ numWorkers: "asc" }, { timeHours: "asc" }, { id: "asc" }],
@@ -72,21 +65,16 @@ function createBusinessError(code: string, message: string) {
   return error;
 }
 
-function normalizeDeviceTypeIds(deviceTypeIds: number[]) {
-  return [...new Set(deviceTypeIds)].filter((id) => Number.isInteger(id) && id > 0);
-}
-
 function mapStageRecord(record: StageRecord): StageWithConfigs {
-  const deviceTypes = record.stageDeviceTypes.map((item) => ({
-    id: item.deviceType.id,
-    name: item.deviceType.name,
-  }));
-
   return {
     id: record.id,
     name: record.name,
     displayOrder: record.displayOrder,
     description: record.description,
+    deviceTypeId: record.deviceTypeId,
+    deviceType: record.deviceType
+      ? { id: record.deviceType.id, name: record.deviceType.name }
+      : null,
     parentStageId: record.parentLink?.parentStageId ?? null,
     parent: record.parentLink?.parentStage
       ? {
@@ -94,15 +82,12 @@ function mapStageRecord(record: StageRecord): StageWithConfigs {
           name: record.parentLink.parentStage.name,
         }
       : null,
-    deviceTypeIds: deviceTypes.map((item) => item.id),
-    deviceTypes,
     workloadConfigs: record.workloadConfigs,
   };
 }
 
 async function getStagesForHierarchy(): Promise<StageWithConfigs[]> {
   const records = await getStageRecords();
-
   return records.map(mapStageRecord);
 }
 
@@ -151,7 +136,6 @@ async function updateStageRelations(
   tx: Prisma.TransactionClient,
   stageId: number,
   parentStageId?: number | null,
-  deviceTypeIds?: number[]
 ) {
   if (parentStageId !== undefined) {
     await tx.stageHierarchy.deleteMany({ where: { childStageId: stageId } });
@@ -165,19 +149,6 @@ async function updateStageRelations(
       });
     }
   }
-
-  if (deviceTypeIds !== undefined) {
-    await tx.stageDeviceType.deleteMany({ where: { stageId } });
-
-    if (deviceTypeIds.length > 0) {
-      await tx.stageDeviceType.createMany({
-        data: deviceTypeIds.map((deviceTypeId) => ({
-          stageId,
-          deviceTypeId,
-        })),
-      });
-    }
-  }
 }
 
 // ==========================================
@@ -188,22 +159,19 @@ export async function createStage(data: {
   displayOrder: number;
   description?: string;
   parentStageId?: number | null;
-  deviceTypeIds?: number[];
+  deviceTypeId: number;
 }) {
-  const normalizedDeviceTypeIds = data.deviceTypeIds
-    ? normalizeDeviceTypeIds(data.deviceTypeIds)
-    : undefined;
-
   const created = await prisma.$transaction(async (tx) => {
     const stage = await tx.stage.create({
       data: {
         name: data.name,
         displayOrder: data.displayOrder,
         description: data.description,
+        deviceTypeId: data.deviceTypeId,
       },
     });
 
-    await updateStageRelations(tx, stage.id, data.parentStageId, normalizedDeviceTypeIds);
+    await updateStageRelations(tx, stage.id, data.parentStageId);
     return stage;
   });
 
@@ -236,7 +204,7 @@ export async function getStageTree() {
 export async function getStageTreeByDeviceTypeId(deviceTypeId: number) {
   const stages = await getStagesForHierarchy();
   const filteredStages = stages.filter((stage) =>
-    stage.deviceTypeIds.includes(deviceTypeId)
+    stage.deviceTypeId === deviceTypeId
   );
   return buildHierarchyTree(filteredStages);
 }
@@ -285,7 +253,7 @@ export async function updateStage(
     displayOrder?: number;
     description?: string;
     parentStageId?: number | null;
-    deviceTypeIds?: number[];
+    deviceTypeId?: number | null;
   }
 ) {
   if (data.parentStageId === id) {
@@ -295,10 +263,6 @@ export async function updateStage(
   if (data.parentStageId !== undefined && data.parentStageId !== null) {
     await assertNoHierarchyCycle(id, data.parentStageId);
   }
-
-  const normalizedDeviceTypeIds = data.deviceTypeIds
-    ? normalizeDeviceTypeIds(data.deviceTypeIds)
-    : undefined;
 
   await prisma.$transaction(async (tx) => {
     await tx.stage.findUniqueOrThrow({ where: { id } });
@@ -313,6 +277,11 @@ export async function updateStage(
     if (data.description !== undefined) {
       stageData.description = data.description;
     }
+    if (data.deviceTypeId !== undefined) {
+      stageData.deviceType = data.deviceTypeId === null
+        ? { disconnect: true }
+        : { connect: { id: data.deviceTypeId } };
+    }
 
     if (Object.keys(stageData).length > 0) {
       await tx.stage.update({
@@ -321,7 +290,7 @@ export async function updateStage(
       });
     }
 
-    await updateStageRelations(tx, id, data.parentStageId, normalizedDeviceTypeIds);
+    await updateStageRelations(tx, id, data.parentStageId);
   });
 
   const stage = await getStageById(id);

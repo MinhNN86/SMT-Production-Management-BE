@@ -4,7 +4,7 @@
  *
  * POST   /api/stages                         - Tạo khâu sản xuất mới
  * GET    /api/stages                         - Lấy danh sách khâu sản xuất
- * GET    /api/stages?tree=true               - Lấy cây khâu sản xuất cha-con (kèm autoCalculatedConfigs)
+ * GET    /api/stages?tree=true               - Lấy cây khâu sản xuất cha-con
  * GET    /api/stages/:id                     - Lấy chi tiết 1 khâu sản xuất
  * GET    /api/stages/device-type/:deviceTypeId - Lấy cây khâu sản xuất theo loại thiết bị
  * PUT    /api/stages/:id                     - Cập nhật khâu sản xuất

@@ -11,35 +11,30 @@ import { sendError, sendSuccess } from "../utils/response.util.js";
 // ==========================================
 export async function create(req: Request, res: Response) {
   try {
-    const { name, displayOrder, description, parentStageId, deviceTypeId, deviceTypeIds } = req.body as {
+    const { name, displayOrder, description, parentStageId, deviceTypeId } = req.body as {
       name: string;
       displayOrder: number;
       description?: string;
       parentStageId?: number | null;
       deviceTypeId?: number | null;
-      deviceTypeIds?: number[];
     };
 
-    if (!name || displayOrder === undefined) {
-      sendError(res, 400, "Thiếu thông tin: name, displayOrder là bắt buộc.");
+    if (!name || displayOrder === undefined || deviceTypeId == null) {
+      sendError(res, 400, "Thiếu thông tin: name, displayOrder, deviceTypeId là bắt buộc.");
       return;
     }
-
-    const normalizedDeviceTypeIds = Array.isArray(deviceTypeIds)
-      ? deviceTypeIds
-      : (deviceTypeId === undefined || deviceTypeId === null ? undefined : [deviceTypeId]);
 
     const stage = await stageService.createStage({
       name,
       displayOrder,
       description,
       parentStageId,
-      deviceTypeIds: normalizedDeviceTypeIds,
+      deviceTypeId,
     });
     sendSuccess(res, 201, "Tạo khâu sản xuất thành công.", stage);
   } catch (error: any) {
     if (error.code === "P2003") {
-      sendError(res, 400, "Stage cha (parentStageId) hoặc một trong các loại thiết bị không tồn tại.");
+      sendError(res, 400, "Stage cha (parentStageId) hoặc loại thiết bị (deviceTypeId) không tồn tại.");
       return;
     }
     sendError(res, 500, "Lỗi server.");
@@ -111,21 +106,14 @@ export async function update(req: Request, res: Response) {
       description?: string;
       parentStageId?: number | null;
       deviceTypeId?: number | null;
-      deviceTypeIds?: number[];
     };
-
-    const normalizedDeviceTypeIds = Array.isArray(data.deviceTypeIds)
-      ? data.deviceTypeIds
-      : (data.deviceTypeId === undefined
-        ? undefined
-        : (data.deviceTypeId === null ? [] : [data.deviceTypeId]));
 
     const stage = await stageService.updateStage(id, {
       name: data.name,
       displayOrder: data.displayOrder,
       description: data.description,
       parentStageId: data.parentStageId,
-      deviceTypeIds: normalizedDeviceTypeIds,
+      deviceTypeId: data.deviceTypeId,
     });
     sendSuccess(res, 200, "Cập nhật khâu sản xuất thành công.", stage);
   } catch (error: any) {
@@ -134,7 +122,7 @@ export async function update(req: Request, res: Response) {
       return;
     }
     if (error.code === "P2003") {
-      sendError(res, 400, "Stage cha (parentStageId) hoặc một trong các loại thiết bị không tồn tại.");
+      sendError(res, 400, "Stage cha (parentStageId) hoặc loại thiết bị (deviceTypeId) không tồn tại.");
       return;
     }
     if (error.code === "STAGE_PARENT_SELF" || error.code === "STAGE_HIERARCHY_CYCLE") {

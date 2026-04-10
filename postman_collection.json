@@ -28,10 +28,7 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -39,14 +36,8 @@
             },
             "url": {
               "raw": "{{base_url}}/api/auth/login",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "login"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
             }
           }
         },
@@ -55,26 +46,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/auth/me",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "me"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "me"]
             }
           }
         },
@@ -83,20 +62,11 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
@@ -104,14 +74,8 @@
             },
             "url": {
               "raw": "{{base_url}}/api/auth/change-password",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "change-password"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
             }
           }
         },
@@ -120,299 +84,45 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"userId\": 2,\n    \"newPassword\": \"newpassword123\"\n}"
+              "raw": "{\n    \"userId\": \"uuid-cua-user\",\n    \"newPassword\": \"newpassword123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/auth/change-password",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "auth",
-                "change-password"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
             }
           }
         }
       ]
     },
     {
-      "name": "B1: Lệnh & Khâu Sản Xuất",
+      "name": "Loại thiết bị (Device Types)",
       "item": [
-        {
-          "name": "Tạo lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"orderCode\": \"LSX-001\",\n    \"totalQuantity\": 1000,\n    \"startDate\": \"2025-04-01\",\n    \"completionDate\": \"2025-04-25\",\n    \"deliveryDate\": \"2025-04-15\",\n    \"deviceTypeId\": 1\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/production-orders",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Danh sách lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/production-orders",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Chi tiết lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/production-orders/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Danh sách nhật ký sản xuất của lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/production-orders/1/production-logs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders",
-                "1",
-                "production-logs"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Lọc nhật ký sản xuất của lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"date\": \"2026-04-07\",\n    \"startDate\": \"2026-04-01\",\n    \"endDate\": \"2026-04-30\",\n    \"shiftIds\": [1, 2, 3]\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/production-orders/1/production-logs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders",
-                "1",
-                "production-logs"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Cập nhật lệnh sản xuất (bao gồm status)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"status\": \"IN_PROGRESS\",\n    \"startDate\": \"2025-04-01\",\n    \"completionDate\": \"2025-04-25\",\n    \"deliveryDate\": \"2025-04-20\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/production-orders/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Xóa lệnh sản xuất",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/production-orders/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-orders",
-                "1"
-              ]
-            }
-          }
-        },
         {
           "name": "Tạo loại thiết bị",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Router WiFi\",\n    \"description\": \"Thiết bị router dòng WiFi 6\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/device-types",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "device-types"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "device-types"]
             }
           }
         },
@@ -421,25 +131,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/device-types",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "device-types"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "device-types"]
             }
           }
         },
@@ -448,26 +147,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/device-types/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "device-types",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "device-types", "1"]
             }
           }
         },
@@ -476,35 +163,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Router WiFi (Cập nhật)\",\n    \"description\": \"Thiết bị router cập nhật\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/device-types/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "device-types",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "device-types", "1"]
             }
           }
         },
@@ -513,134 +183,208 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/device-types/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "device-types",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "device-types", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lệnh sản xuất (Production Orders)",
+      "item": [
+        {
+          "name": "Tạo lệnh sản xuất",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderCode\": \"LSX-001\",\n    \"totalQuantity\": 1000,\n    \"orderSignedDate\": \"2025-04-01\",\n    \"productionStartDate\": \"2025-04-05\",\n    \"completedDate\": \"2025-04-25\",\n    \"deadlineDate\": \"2025-04-30\",\n    \"deviceTypeId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/production-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders"]
             }
           }
         },
         {
-          "name": "Tạo khâu sản xuất (Stage)",
+          "name": "Danh sách lệnh sản xuất",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders"]
+            }
+          }
+        },
+        {
+          "name": "Chi tiết lệnh sản xuất",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật lệnh sản xuất",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"IN_PROGRESS\",\n    \"productionStartDate\": \"2025-04-05\",\n    \"completedDate\": \"2025-04-25\",\n    \"deadlineDate\": \"2025-04-20\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "Xóa lệnh sản xuất",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "Danh sách nhật ký sản xuất của lệnh",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1/production-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1", "production-logs"]
+            }
+          }
+        },
+        {
+          "name": "Lọc nhật ký sản xuất của lệnh",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"startDate\": \"2026-04-01\",\n    \"endDate\": \"2026-04-30\",\n    \"shiftIds\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1/production-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1", "production-logs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Khâu sản xuất (Stages)",
+      "item": [
+        {
+          "name": "Tạo khâu sản xuất",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Lắp ráp MIB\",\n    \"displayOrder\": 1,\n    \"description\": \"Khâu lắp ráp MIB\",\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages"]
             }
           }
         },
         {
-          "name": "Tạo stage cha (không parentStageId)",
+          "name": "Tạo khâu cha (không parentStageId)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Lắp ráp cụm chính\",\n    \"displayOrder\": 10,\n    \"description\": \"Stage cha\"\n}"
+              "raw": "{\n    \"name\": \"Lắp ráp cụm chính\",\n    \"displayOrder\": 10,\n    \"description\": \"Stage cha\",\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages"]
             }
           }
         },
         {
-          "name": "Tạo stage con (có parentStageId)",
+          "name": "Tạo khâu con (có parentStageId)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"name\": \"Bắt vít\",\n    \"displayOrder\": 11,\n    \"description\": \"Stage con của stage cha id=1\",\n    \"parentStageId\": 1\n}"
+              "raw": "{\n    \"name\": \"Bắt vít\",\n    \"displayOrder\": 11,\n    \"description\": \"Stage con của stage cha id=2\",\n    \"parentStageId\": 2,\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages"]
             }
           }
         },
@@ -649,87 +393,31 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/stages",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages"]
             }
           }
         },
         {
-          "name": "Danh sách khâu sản xuất dạng cây (tree=true)",
+          "name": "Danh sách khâu dạng cây (tree=true)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/stages?tree=true",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages"
-              ],
-              "query": [
-                {
-                  "key": "tree",
-                  "value": "true"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Cây khâu sản xuất theo loại thiết bị",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/stages/device-type/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "device-type",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages"],
+              "query": [{ "key": "tree", "value": "true" }]
             }
           }
         },
@@ -738,26 +426,30 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/stages/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "1"]
+            }
+          }
+        },
+        {
+          "name": "Cây khâu sản xuất theo loại thiết bị",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/stages/device-type/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "device-type", "1"]
             }
           }
         },
@@ -766,35 +458,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Lắp ráp MIB (Cập nhật)\",\n    \"displayOrder\": 1,\n    \"description\": \"Khâu lắp ráp MIB - đã cập nhật\",\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "1"]
             }
           }
         },
@@ -803,109 +478,38 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"name\": \"Bắt vít (đổi cha)\",\n    \"parentStageId\": 2\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages/3",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "3"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "3"]
             }
           }
         },
         {
-          "name": "Bỏ stage cha của stage con (parentStageId = null)",
+          "name": "Bỏ stage cha (parentStageId = null)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"parentStageId\": null\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/stages/3",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "3"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Kiểm tra lỗi vòng lặp stage (stage tự làm cha)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"parentStageId\": 3\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/stages/3",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "3"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "3"]
             }
           }
         },
@@ -914,67 +518,39 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/stages/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "stages",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "stages", "1"]
             }
           }
         }
       ]
     },
     {
-      "name": "Danh mục Ca & Nhân viên",
+      "name": "Ca làm việc (Shifts)",
       "item": [
         {
-          "name": "Tạo ca làm việc (Shift)",
+          "name": "Tạo ca làm việc",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"shiftName\": \"Ca 1\",\n    \"startTime\": \"06:00\",\n    \"endTime\": \"14:00\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/shifts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "shifts"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "shifts"]
             }
           }
         },
@@ -983,25 +559,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/shifts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "shifts"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "shifts"]
             }
           }
         },
@@ -1010,26 +575,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/shifts/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "shifts",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "shifts", "1"]
             }
           }
         },
@@ -1038,35 +591,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"shiftName\": \"Ca 1 (Cập nhật)\",\n    \"startTime\": \"07:00\",\n    \"endTime\": \"15:00\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/shifts/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "shifts",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "shifts", "1"]
             }
           }
         },
@@ -1075,62 +611,39 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/shifts/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "shifts",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "shifts", "1"]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Nhân viên (Users)",
+      "item": [
         {
-          "name": "Tạo nhân viên (Worker) + Account",
+          "name": "Tạo nhân viên + Account",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"workerCode\": \"NV001\",\n    \"fullName\": \"Nguyễn Văn A\",\n    \"type\": \"FULLTIME\",\n    \"email\": \"user1@smt.com\",\n    \"password\": \"123456\",\n    \"role\": \"USER\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/users",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "users"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
             }
           }
         },
@@ -1139,25 +652,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/users",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "users"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
             }
           }
         },
@@ -1166,26 +668,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/users/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
+              "raw": "{{base_url}}/api/users/{{sample_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{sample_user_id}}"]
             }
           }
         },
@@ -1194,35 +684,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"fullName\": \"Nguyễn Văn A (Cập nhật)\",\n    \"type\": \"FULLTIME\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/users/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
+              "raw": "{{base_url}}/api/users/{{sample_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{sample_user_id}}"]
             }
           }
         },
@@ -1231,67 +704,39 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/users/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
+              "raw": "{{base_url}}/api/users/{{sample_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{sample_user_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "Danh mục Team",
+      "name": "Team",
       "item": [
         {
           "name": "Tạo team",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"teamName\": \"Team A\",\n    \"description\": \"Nhóm Team A\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/teams",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams"]
             }
           }
         },
@@ -1300,25 +745,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/teams",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams"]
             }
           }
         },
@@ -1327,26 +761,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/teams/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1"]
             }
           }
         },
@@ -1355,35 +777,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"teamName\": \"Team A (Cập nhật)\",\n    \"description\": \"Mô tả mới\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/teams/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1"]
             }
           }
         },
@@ -1392,26 +797,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/teams/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1"]
             }
           }
         },
@@ -1420,36 +813,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"workerIds\": [1, 2, 3]\n}"
+              "raw": "{\n    \"workerIds\": [\"uuid-1\", \"uuid-2\", \"uuid-3\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/teams/1/members",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1",
-                "members"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1", "members"]
             }
           }
         },
@@ -1458,36 +833,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"workerIds\": [2, 3, 4]\n}"
+              "raw": "{\n    \"workerIds\": [\"uuid-2\", \"uuid-3\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/teams/1/members",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1",
-                "members"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1", "members"]
             }
           }
         },
@@ -1496,27 +853,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/teams/1/members",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1",
-                "members"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1", "members"]
             }
           }
         },
@@ -1525,69 +869,39 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/teams/1/members/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "teams",
-                "1",
-                "members",
-                "1"
-              ]
+              "raw": "{{base_url}}/api/teams/1/members/{{sample_user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teams", "1", "members", "{{sample_user_id}}"]
             }
           }
         }
       ]
     },
     {
-      "name": "B2: Cấu hình & Phân công",
+      "name": "Cấu hình định mức (Workload Configs)",
       "item": [
         {
-          "name": "Cấu hình định mức (Workload Config)",
+          "name": "Tạo cấu hình định mức",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"stageId\": 1,\n    \"numWorkers\": 3,\n    \"targetQuantity\": 100\n}"
+              "raw": "{\n    \"stageId\": 1,\n    \"numWorkers\": 3,\n    \"targetQuantity\": 100,\n    \"timeHours\": 8\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/workload-configs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "workload-configs"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "workload-configs"]
             }
           }
         },
@@ -1596,25 +910,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/workload-configs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "workload-configs"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "workload-configs"]
             }
           }
         },
@@ -1623,26 +926,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/workload-configs/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "workload-configs",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "workload-configs", "1"]
             }
           }
         },
@@ -1651,35 +942,18 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"numWorkers\": 4,\n    \"targetQuantity\": 120\n}"
+              "raw": "{\n    \"numWorkers\": 4,\n    \"targetQuantity\": 120,\n    \"timeHours\": 8\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/workload-configs/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "workload-configs",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "workload-configs", "1"]
             }
           }
         },
@@ -1688,98 +962,59 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/workload-configs/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "workload-configs",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "workload-configs", "1"]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Phân công nhân sự (Work Assignments)",
+      "item": [
         {
-          "name": "Phân công nhân sự (Work Assignment)",
+          "name": "Tạo phân công nhân sự",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"workerIds\": [1, 2, 3],\n    \"workDate\": \"2026-03-25\"\n}"
+              "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"workerIds\": [\"uuid-1\", \"uuid-2\", \"uuid-3\"],\n    \"workDate\": \"2026-03-25\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/work-assignments",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "work-assignments"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "work-assignments"]
             }
           }
         },
         {
-          "name": "Cập nhật phân công theo mảng workerIds",
+          "name": "Cập nhật phân công (theo workerIds)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"workerIds\": [2, 3, 4],\n    \"workDate\": \"2026-03-25\"\n}"
+              "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"workerIds\": [\"uuid-2\", \"uuid-3\", \"uuid-4\"],\n    \"workDate\": \"2026-03-25\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/work-assignments",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "work-assignments"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "work-assignments"]
             }
           }
         },
@@ -1788,25 +1023,14 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/work-assignments",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "work-assignments"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "work-assignments"]
             }
           }
         },
@@ -1815,102 +1039,43 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"workDate\": \"2026-03-25\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/work-assignments",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "work-assignments"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "work-assignments"]
             }
           }
         }
       ]
     },
     {
-      "name": "B3: Nhập báo cáo & B4: Thống kê",
+      "name": "Báo cáo sản lượng (Production Logs)",
       "item": [
         {
-          "name": "Nhập báo cáo (Production Logs)",
+          "name": "Nhập/cập nhật báo cáo sản lượng (Upsert)",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
               "raw": "{\n    \"productionOrderId\": 1,\n    \"stageId\": 1,\n    \"shiftId\": 1,\n    \"logDate\": \"2026-03-25\",\n    \"actualQuantity\": 120,\n    \"defectiveQuantity\": 5,\n    \"note\": \"Ghi chú về sản lượng trong ca\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/production-logs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-logs"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Danh sách nhật ký báo cáo",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/production-logs",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-logs"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-logs"]
             }
           }
         },
@@ -1919,99 +1084,94 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"productionOrderId\": 1,\n    \"parentStageId\": 2,\n    \"logDate\": \"2026-04-07\",\n    \"logs\": [\n        {\n            \"stageId\": 3,\n            \"shiftId\": 1,\n            \"actualQuantity\": 120,\n            \"defectiveQuantity\": 5,\n            \"note\": \"Ghi chú cho khâu con 1\"\n        },\n        {\n            \"stageId\": 4,\n            \"shiftId\": 1,\n            \"actualQuantity\": 150,\n            \"defectiveQuantity\": 3,\n            \"note\": \"Ghi chú cho khâu con 2\"\n        },\n        {\n            \"stageId\": 5,\n            \"shiftId\": 2,\n            \"actualQuantity\": 100,\n            \"defectiveQuantity\": 2,\n            \"note\": \"Ghi chú cho khâu con 3\"\n        }\n    ]\n}"
+              "raw": "{\n    \"productionOrderId\": 1,\n    \"parentStageId\": 2,\n    \"logDate\": \"2026-04-07\",\n    \"logs\": [\n        {\n            \"stageId\": 3,\n            \"shiftId\": 1,\n            \"actualQuantity\": 120,\n            \"defectiveQuantity\": 5,\n            \"note\": \"Ghi chú cho khâu con 1\"\n        },\n        {\n            \"stageId\": 4,\n            \"shiftId\": 1,\n            \"actualQuantity\": 150,\n            \"defectiveQuantity\": 3,\n            \"note\": \"Ghi chú cho khâu con 2\"\n        }\n    ]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/production-logs/bulk",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-logs",
-                "bulk"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-logs", "bulk"]
             }
           }
         },
         {
-          "name": "Xóa nhật ký báo cáo",
+          "name": "Danh sách báo cáo sản lượng",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-logs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-logs"]
+            }
+          }
+        },
+        {
+          "name": "Cập nhật báo cáo sản lượng theo ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"actualQuantity\": 130,\n    \"defectiveQuantity\": 3,\n    \"note\": \"Cập nhật ghi chú\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/production-logs/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-logs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Xóa báo cáo sản lượng theo ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "DELETE",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/production-logs/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "production-logs",
-                "1"
-              ]
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-logs", "1"]
             }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Thống kê (Statistics)",
+      "item": [
         {
-          "name": "Xem thống kê (Statistics)",
+          "name": "Thống kê sản lượng",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
             },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{base_url}}/api/statistics?productionOrderId=1&date=2026-03-25",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "statistics"
-              ],
+              "host": ["{{base_url}}"],
+              "path": ["api", "statistics"],
               "query": [
-                {
-                  "key": "productionOrderId",
-                  "value": "1"
-                },
-                {
-                  "key": "date",
-                  "value": "2026-03-25"
-                }
+                { "key": "productionOrderId", "value": "1" },
+                { "key": "date", "value": "2026-03-25" }
               ]
             }
           }
@@ -2027,6 +1187,11 @@
     },
     {
       "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sample_user_id",
       "value": "",
       "type": "string"
     }

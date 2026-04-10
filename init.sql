@@ -87,28 +87,16 @@ CREATE TABLE stages (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   display_order INTEGER NOT NULL DEFAULT 0,
-  description TEXT
-);
+  description TEXT,
+  device_type_id INTEGER,
 
--- Bảng mapping nhiều-nhiều giữa stage và loại thiết bị
-CREATE TABLE stage_device_types (
-  stage_id INTEGER NOT NULL,
-  device_type_id INTEGER NOT NULL,
-
-  CONSTRAINT pk_stage_device_types PRIMARY KEY (stage_id, device_type_id),
-
-  CONSTRAINT fk_stage_device_types_stage
-    FOREIGN KEY (stage_id) REFERENCES stages(id)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-
-  CONSTRAINT fk_stage_device_types_device_type
+  CONSTRAINT fk_stages_device_type
     FOREIGN KEY (device_type_id) REFERENCES device_types(id)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE NO ACTION
 );
 
-CREATE INDEX idx_stage_device_types_device_type_id ON stage_device_types(device_type_id);
+CREATE INDEX idx_stages_device_type_id ON stages(device_type_id);
 
 -- Bảng mapping stage cha-con (mỗi stage con chỉ có 1 stage cha)
 CREATE TABLE stage_hierarchy (
