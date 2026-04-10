@@ -10,7 +10,7 @@ import express from "express";
 import cors from "cors";
 
 // Import middleware xác thực
-import { authenticate, authorizeRole } from "./middleware/auth.middleware.js";
+import { authenticate } from "./middleware/auth.middleware.js";
 
 // Import middleware logging
 import { requestLogger, errorLogger } from "./middleware/logging.middleware.js";
@@ -65,7 +65,6 @@ app.get("/api/health", (_req, res) => {
 // Sau đó kiểm tra quyền: USER chỉ GET, ADMIN full quyền.
 // ==========================================
 app.use(authenticate);
-app.use(authorizeRole);
 
 // ==========================================
 // ROUTES ĐƯỢC BẢO VỆ (CẦN TOKEN)

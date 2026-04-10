@@ -52,8 +52,6 @@ model ProductionOrder {
   productionLogs      ProductionLog[]
   deviceType          DeviceType?            @relation(fields: [deviceTypeId], references: [id], onUpdate: NoAction, map: "fk_production_orders_device_type")
   workAssignments     WorkAssignment[]
-  backupStages        BackupStage[]
-
   @@index([deviceTypeId], map: "idx_production_orders_device_type_id")
   @@map("production_orders")
 }
@@ -69,27 +67,8 @@ model Stage {
   childLinks       StageHierarchy[]      @relation("StageHierarchyParent")
   workloadConfigs  StageWorkloadConfig[]
   workAssignments  WorkAssignment[]
-  backupStages     BackupStage[]
 
   @@map("stages")
-}
-
-model BackupStage {
-  id             Int              @id @default(autoincrement())
-  name           String           @db.VarChar(255)
-  orderId        Int              @map("order_id")
-  displayOrder   Int              @default(0) @map("display_order")
-  description    String?
-  parentStageId  Int?             @map("parent_stage_id")
-  createdAt      DateTime?        @default(now()) @map("created_at") @db.Timestamp(6)
-  productionOrder ProductionOrder @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_backup_stages_order")
-  parentStage    Stage?           @relation(fields: [parentStageId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_backup_stages_parent_stage")
-  workAssignments WorkAssignment[]
-  productionLogs  ProductionLog[]
-
-  @@index([orderId], map: "idx_backup_stages_order_id")
-  @@index([parentStageId], map: "idx_backup_stages_parent_stage_id")
-  @@map("backup_stages")
 }
 
 model Shift {
@@ -131,27 +110,23 @@ model User {
 model WorkAssignment {
   id                Int             @id @default(autoincrement())
   productionOrderId Int             @map("production_order_id")
-  stageId           Int?            @map("stage_id")
-  backupStageId     Int?            @map("backup_stage_id")
+  stageId           Int             @map("stage_id")
   shiftId           Int             @map("shift_id")
   workerId          String          @map("worker_id") @db.Uuid
   workDate          DateTime        @map("work_date") @db.Date
   productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_wa_production_order")
-  stage             Stage?          @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_wa_stage")
-  backupStage       BackupStage?    @relation(fields: [backupStageId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_wa_backup_stage")
+  stage             Stage           @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_wa_stage")
   shift             Shift           @relation(fields: [shiftId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_wa_shift")
   worker            User            @relation(fields: [workerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_wa_worker")
 
   @@unique([workerId, workDate, shiftId], map: "unique_worker_shift")
-  @@index([backupStageId], map: "idx_work_assignments_backup_stage_id")
   @@map("work_assignments")
 }
 
 model ProductionLog {
   id                Int             @id @default(autoincrement())
   productionOrderId Int             @map("production_order_id")
-  stageId           Int?            @map("stage_id")
-  backupStageId     Int?            @map("backup_stage_id")
+  stageId           Int             @map("stage_id")
   shiftId           Int             @map("shift_id")
   logDate           DateTime        @map("log_date") @db.Date
   actualQuantity    Int             @default(0) @map("actual_quantity")
@@ -160,11 +135,9 @@ model ProductionLog {
   createdAt         DateTime?       @default(now()) @map("created_at") @db.Timestamp(6)
   productionOrder   ProductionOrder @relation(fields: [productionOrderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pl_production_order")
   shift             Shift           @relation(fields: [shiftId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pl_shift")
-  stage             Stage?          @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pl_stage")
-  backupStage       BackupStage?    @relation(fields: [backupStageId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_pl_backup_stage")
+  stage             Stage           @relation(fields: [stageId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pl_stage")
 
   @@unique([productionOrderId, stageId, shiftId, logDate], map: "unique_production_log_stage")
-  @@unique([productionOrderId, backupStageId, shiftId, logDate], map: "unique_production_log_backup_stage")
   @@map("production_logs")
 }
 

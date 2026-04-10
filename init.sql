@@ -30,6 +30,26 @@ CREATE TABLE teams (
   description TEXT
 );
 
+-- Bảng thành viên thuộc team
+CREATE TABLE team_members (
+  id SERIAL PRIMARY KEY,
+  team_id INTEGER NOT NULL,
+  worker_id UUID NOT NULL,
+  joined_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+
+  CONSTRAINT unique_team_member UNIQUE (team_id, worker_id),
+
+  CONSTRAINT fk_team_members_team
+    FOREIGN KEY (team_id) REFERENCES teams(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT fk_team_members_worker
+    FOREIGN KEY (worker_id) REFERENCES users(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+);
+
 -- ==========================================
 -- BƯỚC 1: QUẢN LÝ SẢN PHẨM & LỆNH SẢN XUẤT
 -- ==========================================
@@ -45,18 +65,19 @@ CREATE TABLE device_types (
 CREATE TABLE production_orders (
   id SERIAL PRIMARY KEY,
   order_code VARCHAR(50) UNIQUE NOT NULL,
-  total_quantity INT NOT NULL, -- Tổng số lượng thiết bị cần sản xuất
-  order_signed_date DATE, -- Ngày ký lệnh: ngày nhận được lệnh xác nhận sản xuất
-  production_start_date DATE, -- Ngày bắt đầu: ngày bắt đầu nhận vật tư và bắt đầu sản xuất
-  completed_date DATE, -- Ngày hoàn thành: khi xong hết công đoạn và thành phẩm
-  deadline_date DATE, -- Ngày cần giao: deadline của lệnh sản xuất
-  device_type_id INT,
+  total_quantity INTEGER NOT NULL,
+  order_signed_date DATE,
+  production_start_date DATE,
+  completed_date DATE,
+  deadline_date DATE,
   status production_orders_status_enum DEFAULT 'PENDING',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+  device_type_id INTEGER,
 
   CONSTRAINT fk_production_orders_device_type
     FOREIGN KEY (device_type_id) REFERENCES device_types(id)
     ON DELETE SET NULL
+    ON UPDATE NO ACTION
 );
 
 CREATE INDEX idx_production_orders_device_type_id ON production_orders(device_type_id);
@@ -64,69 +85,50 @@ CREATE INDEX idx_production_orders_device_type_id ON production_orders(device_ty
 -- Bảng danh mục các khâu sản xuất (Admin tự cấu hình)
 CREATE TABLE stages (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL, -- Lắp ráp mib, lắp ráp mob, test, đóng nắp...
-  display_order INT NOT NULL DEFAULT 0,
+  name VARCHAR(255) NOT NULL,
+  display_order INTEGER NOT NULL DEFAULT 0,
   description TEXT
 );
 
--- Bảng mapping stage cha-con (mỗi stage con chỉ có 1 stage cha)
-CREATE TABLE stage_hierarchy (
-  child_stage_id INT PRIMARY KEY,
-  parent_stage_id INT NOT NULL,
-
-  CONSTRAINT chk_stage_hierarchy_no_self
-    CHECK (child_stage_id <> parent_stage_id),
-
-  CONSTRAINT fk_stage_hierarchy_child
-    FOREIGN KEY (child_stage_id) REFERENCES stages(id)
-    ON DELETE CASCADE,
-
-  CONSTRAINT fk_stage_hierarchy_parent
-    FOREIGN KEY (parent_stage_id) REFERENCES stages(id)
-    ON DELETE CASCADE
-);
-
-CREATE INDEX idx_stage_hierarchy_parent_stage_id ON stage_hierarchy(parent_stage_id);
-
 -- Bảng mapping nhiều-nhiều giữa stage và loại thiết bị
 CREATE TABLE stage_device_types (
-  stage_id INT NOT NULL,
-  device_type_id INT NOT NULL,
+  stage_id INTEGER NOT NULL,
+  device_type_id INTEGER NOT NULL,
 
   CONSTRAINT pk_stage_device_types PRIMARY KEY (stage_id, device_type_id),
 
   CONSTRAINT fk_stage_device_types_stage
     FOREIGN KEY (stage_id) REFERENCES stages(id)
-    ON DELETE CASCADE,
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
 
   CONSTRAINT fk_stage_device_types_device_type
     FOREIGN KEY (device_type_id) REFERENCES device_types(id)
     ON DELETE CASCADE
+    ON UPDATE NO ACTION
 );
 
 CREATE INDEX idx_stage_device_types_device_type_id ON stage_device_types(device_type_id);
 
--- Bảng khâu tạm thời (backup stage) cho lệnh sản xuất cụ thể
-CREATE TABLE backup_stages (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  order_id INT NOT NULL,
-  display_order INT NOT NULL DEFAULT 0,
-  description TEXT,
-  parent_stage_id INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- Bảng mapping stage cha-con (mỗi stage con chỉ có 1 stage cha)
+CREATE TABLE stage_hierarchy (
+  child_stage_id INTEGER NOT NULL,
+  parent_stage_id INTEGER NOT NULL,
 
-  CONSTRAINT fk_backup_stages_order
-    FOREIGN KEY (order_id) REFERENCES production_orders(id)
-    ON DELETE CASCADE,
+  CONSTRAINT pk_stage_hierarchy PRIMARY KEY (child_stage_id),
 
-  CONSTRAINT fk_backup_stages_parent_stage
+  CONSTRAINT fk_stage_hierarchy_child
+    FOREIGN KEY (child_stage_id) REFERENCES stages(id)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT fk_stage_hierarchy_parent
     FOREIGN KEY (parent_stage_id) REFERENCES stages(id)
-    ON DELETE SET NULL
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
 );
 
-CREATE INDEX idx_backup_stages_order_id ON backup_stages(order_id);
-CREATE INDEX idx_backup_stages_parent_stage_id ON backup_stages(parent_stage_id);
+CREATE INDEX idx_stage_hierarchy_parent_stage_id ON stage_hierarchy(parent_stage_id);
 
 -- ==========================================
 -- BƯỚC 2: CA LÀM VIỆC
@@ -136,8 +138,8 @@ CREATE INDEX idx_backup_stages_parent_stage_id ON backup_stages(parent_stage_id)
 CREATE TABLE shifts (
   id SERIAL PRIMARY KEY,
   shift_name VARCHAR(50) NOT NULL,
-  start_time TIME,
-  end_time TIME
+  start_time TIME(6),
+  end_time TIME(6)
 );
 
 -- ==========================================
@@ -147,76 +149,59 @@ CREATE TABLE shifts (
 -- Bảng cấu hình định mức công việc (Admin cấu hình số lượng làm việc)
 CREATE TABLE stage_workload_configs (
   id SERIAL PRIMARY KEY,
-  stage_id INT NOT NULL,
-  num_workers INT NOT NULL,
-  target_quantity INT NOT NULL, -- Số lượng bộ/sản phẩm tương ứng
-  time_hours DOUBLE PRECISION NOT NULL, -- Thời gian làm việc (giờ)
+  stage_id INTEGER NOT NULL,
+  num_workers INTEGER NOT NULL,
+  target_quantity INTEGER NOT NULL,
+  time_hours DOUBLE PRECISION NOT NULL,
+
   CONSTRAINT fk_stage_workload_stage
     FOREIGN KEY (stage_id) REFERENCES stages(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
 
 -- Bảng danh sách nhân viên
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY,
   worker_code VARCHAR(50) UNIQUE NOT NULL,
   full_name VARCHAR(255) NOT NULL,
   type type_workers_enum,
-  email VARCHAR(255) UNIQUE,           -- Email đăng nhập (có thể NULL nếu worker không cần login)
-  password VARCHAR(255),               -- Mật khẩu đã mã hóa bcrypt
-  role user_role_enum DEFAULT 'USER'   -- Phân quyền: ADMIN hoặc USER
-);
-
--- Bảng thành viên thuộc team
-CREATE TABLE team_members (
-  id SERIAL PRIMARY KEY,
-  team_id INT NOT NULL,
-  worker_id UUID NOT NULL,
-  joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT unique_team_member UNIQUE (team_id, worker_id),
-
-  CONSTRAINT fk_team_members_team
-    FOREIGN KEY (team_id) REFERENCES teams(id),
-
-  CONSTRAINT fk_team_members_worker
-    FOREIGN KEY (worker_id) REFERENCES users(id)
+  email VARCHAR(255) UNIQUE,
+  password VARCHAR(255),
+  role user_role_enum DEFAULT 'USER'
 );
 
 -- Bảng phân công nhân sự vào khâu làm việc theo ngày/ca
 CREATE TABLE work_assignments (
   id SERIAL PRIMARY KEY,
-  production_order_id INT NOT NULL,
-  stage_id INT,
-  backup_stage_id INT,
-  shift_id INT NOT NULL,
+  production_order_id INTEGER NOT NULL,
+  stage_id INTEGER NOT NULL,
+  shift_id INTEGER NOT NULL,
   worker_id UUID NOT NULL,
   work_date DATE NOT NULL,
-
-  CONSTRAINT chk_wa_exactly_one_stage CHECK (
-    (stage_id IS NOT NULL AND backup_stage_id IS NULL) OR
-    (stage_id IS NULL AND backup_stage_id IS NOT NULL)
-  ),
 
   CONSTRAINT unique_worker_shift UNIQUE (worker_id, work_date, shift_id),
 
   CONSTRAINT fk_wa_production_order
-    FOREIGN KEY (production_order_id) REFERENCES production_orders(id),
+    FOREIGN KEY (production_order_id) REFERENCES production_orders(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
 
   CONSTRAINT fk_wa_stage
-    FOREIGN KEY (stage_id) REFERENCES stages(id),
-
-  CONSTRAINT fk_wa_backup_stage
-    FOREIGN KEY (backup_stage_id) REFERENCES backup_stages(id)
-    ON DELETE CASCADE,
+    FOREIGN KEY (stage_id) REFERENCES stages(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
 
   CONSTRAINT fk_wa_shift
-    FOREIGN KEY (shift_id) REFERENCES shifts(id),
+    FOREIGN KEY (shift_id) REFERENCES shifts(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
 
   CONSTRAINT fk_wa_worker
     FOREIGN KEY (worker_id) REFERENCES users(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
-
-CREATE INDEX idx_work_assignments_backup_stage_id ON work_assignments(backup_stage_id);
 
 -- ==========================================
 -- BƯỚC 4: NHẬT KÝ THỐNG KÊ SẢN XUẤT
@@ -224,20 +209,14 @@ CREATE INDEX idx_work_assignments_backup_stage_id ON work_assignments(backup_sta
 
 CREATE TABLE production_logs (
   id SERIAL PRIMARY KEY,
-  production_order_id INT NOT NULL,
-  stage_id INT,
-  backup_stage_id INT,
-  shift_id INT NOT NULL,
+  production_order_id INTEGER NOT NULL,
+  stage_id INTEGER NOT NULL,
+  shift_id INTEGER NOT NULL,
   log_date DATE NOT NULL,
-  actual_quantity INT NOT NULL DEFAULT 0,
-  defective_quantity INT NOT NULL DEFAULT 0,
+  actual_quantity INTEGER NOT NULL DEFAULT 0,
+  defective_quantity INTEGER NOT NULL DEFAULT 0,
   note TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  CONSTRAINT chk_pl_exactly_one_stage CHECK (
-    (stage_id IS NOT NULL AND backup_stage_id IS NULL) OR
-    (stage_id IS NULL AND backup_stage_id IS NOT NULL)
-  ),
+  created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT unique_production_log_stage UNIQUE (
     production_order_id,
@@ -246,23 +225,18 @@ CREATE TABLE production_logs (
     log_date
   ),
 
-  CONSTRAINT unique_production_log_backup_stage UNIQUE (
-    production_order_id,
-    backup_stage_id,
-    shift_id,
-    log_date
-  ),
-
   CONSTRAINT fk_pl_production_order
-    FOREIGN KEY (production_order_id) REFERENCES production_orders(id),
-
-  CONSTRAINT fk_pl_stage
-    FOREIGN KEY (stage_id) REFERENCES stages(id),
-
-  CONSTRAINT fk_pl_backup_stage
-    FOREIGN KEY (backup_stage_id) REFERENCES backup_stages(id)
-    ON DELETE CASCADE,
+    FOREIGN KEY (production_order_id) REFERENCES production_orders(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
 
   CONSTRAINT fk_pl_shift
     FOREIGN KEY (shift_id) REFERENCES shifts(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+
+  CONSTRAINT fk_pl_stage
+    FOREIGN KEY (stage_id) REFERENCES stages(id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
 );
