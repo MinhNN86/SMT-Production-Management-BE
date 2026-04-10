@@ -5,6 +5,7 @@
 CREATE TYPE production_orders_status_enum AS ENUM (
   'PENDING',
   'IN_PROGRESS',
+  'PAUSED',
   'COMPLETED'
 );
 

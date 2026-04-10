@@ -35,11 +35,9 @@ function formatProductionLogDates(log: any) {
 export async function createProductionOrder(data: {
   orderCode: string;
   totalQuantity: number;
-  orderSignedDate?: Date;
-  productionStartDate?: Date;
-  completedDate?: Date;
-  deadlineDate: Date;
-  deviceTypeId: number;
+  orderSignedDate: Date;
+  deadlineDate?: Date;
+  deviceTypeId?: number | null;
 }) {
   const result = await prisma.productionOrder.create({
     data,
@@ -171,4 +169,60 @@ export async function getProductionLogsWithFilters(filters: {
     ],
   });
   return logs.map(formatProductionLogDates);
+}
+
+export async function startProduction(id: number) {
+  const order = await prisma.productionOrder.findUnique({
+    where: { id },
+    select: { status: true },
+  });
+
+  if (!order) {
+    throw new Error("Production order not found");
+  }
+
+  const result = await prisma.productionOrder.update({
+    where: { id },
+    data: {
+      status: "IN_PROGRESS",
+      productionStartDate: order.status === "PENDING" ? new Date() : undefined,
+    },
+    include: {
+      deviceType: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+  return formatProductionOrderDates(result);
+}
+
+export async function pauseProduction(id: number) {
+  const result = await prisma.productionOrder.update({
+    where: { id },
+    data: {
+      status: "PAUSED",
+    },
+    include: {
+      deviceType: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+  return formatProductionOrderDates(result);
+}
+
+export async function completeProduction(id: number) {
+  const result = await prisma.productionOrder.update({
+    where: { id },
+    data: {
+      status: "COMPLETED",
+      completedDate: new Date(),
+    },
+    include: {
+      deviceType: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+  return formatProductionOrderDates(result);
 }

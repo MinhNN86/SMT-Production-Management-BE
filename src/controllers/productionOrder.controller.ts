@@ -12,23 +12,27 @@ import { transformEmbeddedShifts } from "../utils/transform.util.js";
 // ==========================================
 export async function create(req: Request, res: Response) {
   try {
-    const { orderCode, totalQuantity, orderSignedDate, productionStartDate, completedDate, deadlineDate, deviceTypeId } = req.body as {
+    const { orderCode, totalQuantity, orderSignedDate, deadlineDate, deviceTypeId } = req.body as {
       orderCode?: string;
       totalQuantity?: number;
       orderSignedDate?: string;
-      productionStartDate?: string;
-      completedDate?: string;
       deadlineDate?: string;
       deviceTypeId?: number | null;
     };
 
-    if (!orderCode?.trim() || totalQuantity == null || !deadlineDate || deviceTypeId == null) {
-      sendError(res, 400, "Thiếu thông tin: orderCode, totalQuantity, deadlineDate, deviceTypeId là bắt buộc.");
+    if (!orderCode?.trim() || totalQuantity == null || !orderSignedDate) {
+      sendError(res, 400, "Thiếu thông tin: orderCode, totalQuantity, orderSignedDate là bắt buộc.");
       return;
     }
 
-    const parsedDeadlineDate = new Date(deadlineDate);
-    if (Number.isNaN(parsedDeadlineDate.getTime())) {
+    const parsedOrderSignedDate = new Date(orderSignedDate);
+    if (Number.isNaN(parsedOrderSignedDate.getTime())) {
+      sendError(res, 400, "orderSignedDate không hợp lệ.");
+      return;
+    }
+
+    const parsedDeadlineDate = deadlineDate ? new Date(deadlineDate) : undefined;
+    if (parsedDeadlineDate && Number.isNaN(parsedDeadlineDate.getTime())) {
       sendError(res, 400, "deadlineDate không hợp lệ.");
       return;
     }
@@ -38,29 +42,18 @@ export async function create(req: Request, res: Response) {
       return;
     }
 
-    if (!Number.isInteger(deviceTypeId) || deviceTypeId <= 0) {
-      sendError(res, 400, "deviceTypeId phải là số nguyên dương.");
-      return;
-    }
-
     const order = await productionOrderService.createProductionOrder({
       orderCode: orderCode.trim(),
       totalQuantity,
-      orderSignedDate: orderSignedDate ? new Date(orderSignedDate) : undefined,
-      productionStartDate: productionStartDate ? new Date(productionStartDate) : undefined,
-      completedDate: completedDate ? new Date(completedDate) : undefined,
+      orderSignedDate: parsedOrderSignedDate,
       deadlineDate: parsedDeadlineDate,
-      deviceTypeId,
+      deviceTypeId: deviceTypeId ?? null,
     });
 
     sendSuccess(res, 201, "Tạo lệnh sản xuất thành công.", order);
   } catch (error: any) {
     if (error.code === "P2002") {
       sendError(res, 409, "Mã lệnh sản xuất đã tồn tại.");
-      return;
-    }
-    if (error.code === "P2003") {
-      sendError(res, 400, "Loại thiết bị (deviceTypeId) không tồn tại.");
       return;
     }
     sendError(res, 500, "Lỗi server.");
@@ -104,24 +97,30 @@ export async function getById(req: Request, res: Response) {
 export async function update(req: Request, res: Response) {
   try {
     const id = parseInt(req.params["id"] as string, 10);
-    const { deadlineDate, orderSignedDate, productionStartDate, completedDate, ...rest } = req.body as {
+    const { orderCode, totalQuantity, orderSignedDate, deadlineDate, deviceTypeId } = req.body as {
       orderCode?: string;
       totalQuantity?: number;
       orderSignedDate?: string;
-      productionStartDate?: string;
-      completedDate?: string;
       deadlineDate?: string;
       deviceTypeId?: number | null;
-      status?: "PENDING" | "IN_PROGRESS" | "COMPLETED";
     };
 
-    const data = {
-      ...rest,
-      orderSignedDate: orderSignedDate ? new Date(orderSignedDate) : undefined,
-      productionStartDate: productionStartDate ? new Date(productionStartDate) : undefined,
-      completedDate: completedDate ? new Date(completedDate) : undefined,
-      deadlineDate: deadlineDate ? new Date(deadlineDate) : undefined,
-    };
+    const data: any = {};
+    if (orderCode !== undefined) {
+      data.orderCode = orderCode;
+    }
+    if (totalQuantity !== undefined) {
+      data.totalQuantity = totalQuantity;
+    }
+    if (orderSignedDate !== undefined) {
+      data.orderSignedDate = new Date(orderSignedDate);
+    }
+    if (deadlineDate !== undefined) {
+      data.deadlineDate = new Date(deadlineDate);
+    }
+    if (deviceTypeId !== undefined) {
+      data.deviceTypeId = deviceTypeId;
+    }
 
     const order = await productionOrderService.updateProductionOrder(id, data);
     sendSuccess(res, 200, "Cập nhật lệnh sản xuất thành công.", order);
@@ -234,6 +233,87 @@ export async function filterProductionLogs(req: Request, res: Response) {
 
     const logs = await productionOrderService.getProductionLogsWithFilters(filters);
     sendSuccess(res, 200, "Lọc nhật ký sản xuất thành công.", transformEmbeddedShifts(logs));
+  } catch (error: any) {
+    sendError(res, 500, "Lỗi server.");
+  }
+}
+
+export async function startProduction(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params["id"] as string, 10);
+
+    if (isNaN(id)) {
+      sendError(res, 400, "ID không hợp lệ.");
+      return;
+    }
+
+    const order = await productionOrderService.getProductionOrderById(id);
+    if (!order) {
+      sendError(res, 404, "Không tìm thấy lệnh sản xuất.");
+      return;
+    }
+
+    if (order.status !== "PENDING" && order.status !== "PAUSED") {
+      sendError(res, 400, "Chỉ có thể bắt đầu lệnh sản xuất từ trạng thái PENDING hoặc PAUSED.");
+      return;
+    }
+
+    const result = await productionOrderService.startProduction(id);
+    sendSuccess(res, 200, "Đã bắt đầu sản xuất.", result);
+  } catch (error: any) {
+    sendError(res, 500, "Lỗi server.");
+  }
+}
+
+export async function pauseProduction(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params["id"] as string, 10);
+
+    if (isNaN(id)) {
+      sendError(res, 400, "ID không hợp lệ.");
+      return;
+    }
+
+    const order = await productionOrderService.getProductionOrderById(id);
+    if (!order) {
+      sendError(res, 404, "Không tìm thấy lệnh sản xuất.");
+      return;
+    }
+
+    if (order.status !== "IN_PROGRESS") {
+      sendError(res, 400, "Chỉ có thể dừng tạm thời lệnh sản xuất từ trạng thái IN_PROGRESS.");
+      return;
+    }
+
+    const result = await productionOrderService.pauseProduction(id);
+    sendSuccess(res, 200, "Đã dừng tạm thời sản xuất.", result);
+  } catch (error: any) {
+    sendError(res, 500, "Lỗi server.");
+  }
+}
+
+export async function completeProduction(req: Request, res: Response) {
+  try {
+    const id = parseInt(req.params["id"] as string, 10);
+
+    if (isNaN(id)) {
+      sendError(res, 400, "ID không hợp lệ.");
+      return;
+    }
+
+    const order = await productionOrderService.getProductionOrderById(id);
+    if (!order) {
+      sendError(res, 404, "Không tìm thấy lệnh sản xuất.");
+      return;
+    }
+
+    if (order.status !== "IN_PROGRESS") {
+      sendError(res, 400, "Chỉ có thể hoàn thành lệnh sản xuất từ trạng thái IN_PROGRESS.");
+      return;
+    }
+
+    const result = await productionOrderService.completeProduction(id);
+    sendSuccess(res, 200, "Đã hoàn thành sản xuất.", result);
   } catch (error: any) {
     sendError(res, 500, "Lỗi server.");
   }

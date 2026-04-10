@@ -159,6 +159,7 @@ model StageHierarchy {
 enum ProductionOrderStatus {
   PENDING
   IN_PROGRESS
+  PAUSED
   COMPLETED
 
   @@map("production_orders_status_enum")

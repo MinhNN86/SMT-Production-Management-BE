@@ -210,7 +210,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"orderCode\": \"LSX-001\",\n    \"totalQuantity\": 1000,\n    \"orderSignedDate\": \"2025-04-01\",\n    \"productionStartDate\": \"2025-04-05\",\n    \"completedDate\": \"2025-04-25\",\n    \"deadlineDate\": \"2025-04-30\",\n    \"deviceTypeId\": 1\n}"
+              "raw": "{\n    \"orderCode\": \"LSX-001\",\n    \"totalQuantity\": 1000,\n    \"orderSignedDate\": \"2025-04-01\",\n    \"deadlineDate\": \"2025-04-30\",\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/production-orders",
@@ -262,7 +262,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"status\": \"IN_PROGRESS\",\n    \"productionStartDate\": \"2025-04-05\",\n    \"completedDate\": \"2025-04-25\",\n    \"deadlineDate\": \"2025-04-20\"\n}"
+              "raw": "{\n    \"orderCode\": \"LSX-001-UPDATE\",\n    \"totalQuantity\": 1200,\n    \"deadlineDate\": \"2025-05-10\",\n    \"deviceTypeId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/production-orders/1",
@@ -320,6 +320,54 @@
               "raw": "{{base_url}}/api/production-orders/1/production-logs",
               "host": ["{{base_url}}"],
               "path": ["api", "production-orders", "1", "production-logs"]
+            }
+          }
+        },
+        {
+          "name": "Bắt đầu sản xuất (Start)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1", "start"]
+            }
+          }
+        },
+        {
+          "name": "Dừng tạm thời sản xuất (Pause)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1/pause",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1", "pause"]
+            }
+          }
+        },
+        {
+          "name": "Hoàn thành sản xuất (Complete)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{jwt_token}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/production-orders/1/complete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "production-orders", "1", "complete"]
             }
           }
         }
